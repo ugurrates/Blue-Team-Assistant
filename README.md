@@ -1,7 +1,7 @@
 # Blue Team Assistant
 
-**Professional Threat Intelligence & Malware Analysis Toolkit for SOC Operations**
-
+LLM supported Toolkit for Blue Team/<img width="1189" height="983" alt="Ekran görüntüsü 2026-01-08 113358" src="https://github.com/user-attachments/assets/2c91250b-c5c6-41b0-b47d-fca6e2765e16" />
+ SOC Operations
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/ugur-ates/blue-team-assistant)
