@@ -1,0 +1,25 @@
+# Blue Team Assistant - Dependencies
+# Author: Ugur Ates
+
+# Core
+requests>=2.28.0
+pyyaml>=6.0
+python-dateutil>=2.8.0
+
+# File Analysis
+pefile>=2023.2.7
+yara-python>=4.3.0
+python-magic>=0.4.27
+ssdeep>=3.4
+oletools>=0.60
+
+# Email Analysis
+dnspython>=2.3.0
+mail-parser>=3.15.0
+
+# Optional: LLM Integration
+# anthropic>=0.18.0
+# openai>=1.0.0
+
+# Optional: Advanced Analysis
+# capa>=6.0.0

@@ -23,6 +23,10 @@ Blue Team Assistant is a comprehensive, local-first security analysis toolkit de
   - [File Analyzers](#file-analyzers)
   - [Email Analysis](#email-analysis)
   - [IOC Investigation](#ioc-investigation)
+- [LLM Integration](#llm-integration)
+  - [Ollama Setup](#ollama-setup-recommended)
+  - [LLM Analysis Features](#llm-analysis-features)
+  - [Cloud Providers](#cloud-providers-optional)
 - [Threat Intelligence Sources](#threat-intelligence-sources)
 - [Scoring System](#scoring-system)
 - [Detection Rule Generation](#detection-rule-generation)
@@ -30,6 +34,8 @@ Blue Team Assistant is a comprehensive, local-first security analysis toolkit de
 - [False Positive Filtering](#false-positive-filtering)
 - [Project Structure](#project-structure)
 - [API Reference](#api-reference)
+- [Roadmap](#roadmap)
+  - [v2.0.0 Features](#v200-future)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -161,6 +167,8 @@ pip install flare-capa
 ```
 
 ### Ollama Setup
+
+For AI-powered analysis, install Ollama (see [LLM Integration](#llm-integration) for details):
 
 ```bash
 # Install Ollama
@@ -488,6 +496,222 @@ result = await investigator.investigate("185.220.101.1")
 | SHA1 | da39a3ee5e6b4b0d3255bfef95601890afd80709 | 40 hex chars |
 | SHA256 | e3b0c44298fc1c149afbf4c8996fb924... | 64 hex chars |
 | Email | attacker@evil.com | Email regex |
+
+---
+
+## LLM Integration
+
+Blue Team Assistant supports multiple LLM providers for AI-powered analysis. The **local-first approach** using Ollama is recommended for sensitive environments.
+
+### Provider Comparison
+
+| Provider | Privacy | Cost | Speed | Best For |
+|----------|---------|------|-------|----------|
+| **Ollama (Local)** | ✅ Full privacy | Free | Medium | Critical infrastructure, sensitive data |
+| **Anthropic Claude** | ⚠️ Cloud | Paid | Fast | Non-sensitive, high-quality analysis |
+| **OpenAI** | ⚠️ Cloud | Paid | Fast | General purpose |
+
+### Ollama Setup (Recommended)
+
+#### Installation
+
+```bash
+# Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# macOS
+brew install ollama
+
+# Windows
+# Download from: https://ollama.com/download/windows
+```
+
+#### Pull Recommended Models
+
+```bash
+# Best balance of speed and quality (RECOMMENDED)
+ollama pull llama3.1:8b
+
+# Faster, lighter model
+ollama pull llama3.2:3b
+
+# More capable, slower
+ollama pull llama3.1:70b
+
+# Security-focused models
+ollama pull mistral:7b
+ollama pull qwen2.5:7b
+
+# Verify installation
+ollama list
+```
+
+#### Model Recommendations
+
+| Model | VRAM | Speed | Quality | Use Case |
+|-------|------|-------|---------|----------|
+| `llama3.2:3b` | 4GB | ⚡⚡⚡ | ★★☆ | Quick triage, low resources |
+| `llama3.1:8b` | 8GB | ⚡⚡ | ★★★ | **Recommended default** |
+| `mistral:7b` | 8GB | ⚡⚡ | ★★★ | Good for technical analysis |
+| `qwen2.5:7b` | 8GB | ⚡⚡ | ★★★ | Multilingual support |
+| `llama3.1:70b` | 48GB | ⚡ | ★★★★ | Deep analysis, high accuracy |
+
+#### Configuration
+
+```yaml
+# config.yaml
+llm:
+  provider: "ollama"              # Use local Ollama
+  ollama_endpoint: "http://localhost:11434"
+  ollama_model: "llama3.1:8b"     # Model to use
+  temperature: 0.3                 # Lower = more consistent
+  timeout: 120                     # Seconds (local can be slower)
+```
+
+#### Verify Ollama is Running
+
+```bash
+# Check Ollama status
+curl http://localhost:11434/api/tags
+
+# Test generation
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3.1:8b",
+  "prompt": "What is malware?",
+  "stream": false
+}'
+```
+
+### LLM Analysis Features
+
+The LLM provides intelligent analysis across all modules:
+
+#### IOC Analysis
+
+```python
+# LLM analyzes threat intelligence results
+{
+    "verdict": "MALICIOUS",
+    "analysis": "This IP (185.220.101.1) is a known Tor exit node flagged 
+                 by 8/15 sources. Associated with scanning activity and 
+                 potential C2 communication patterns.",
+    "recommendations": [
+        "Block at perimeter firewall immediately",
+        "Search SIEM for historical connections",
+        "Check for lateral movement indicators",
+        "Update threat intelligence feeds"
+    ]
+}
+```
+
+#### Malware Analysis
+
+```python
+# LLM provides behavior interpretation
+{
+    "verdict": "LIKELY MALICIOUS",
+    "analysis": "PE file exhibits multiple evasion techniques including 
+                 high entropy sections (possible packing), anti-VM checks,
+                 and suspicious API imports (CreateRemoteThread, VirtualAllocEx).",
+    "mitre_mapping": ["T1055", "T1027", "T1497"],
+    "recommendations": [
+        "Detonate in isolated sandbox",
+        "Extract and analyze packed payload",
+        "Create detection signatures",
+        "Hunt for similar samples"
+    ]
+}
+```
+
+#### Email Analysis
+
+```python
+# LLM provides phishing assessment
+{
+    "verdict": "PHISHING",
+    "analysis": "Email impersonates Microsoft with lookalike domain 
+                 (micros0ft-support.com). Contains urgency language,
+                 mismatched display/actual URLs, and suspicious attachment.",
+    "indicators": [
+        "Sender domain age: 2 days",
+        "SPF: fail, DKIM: none",
+        "URL redirects to credential harvester"
+    ],
+    "recommendations": [
+        "Block sender domain organization-wide",
+        "Alert affected users",
+        "Reset credentials if clicked",
+        "Report to anti-phishing feeds"
+    ]
+}
+```
+
+### Cloud Providers (Optional)
+
+#### Anthropic Claude
+
+```yaml
+# config.yaml
+llm:
+  provider: "anthropic"
+
+api_keys:
+  anthropic: "sk-ant-api03-..."
+```
+
+#### OpenAI
+
+```yaml
+# config.yaml  
+llm:
+  provider: "openai"
+  openai_model: "gpt-4o"
+
+api_keys:
+  openai: "sk-..."
+```
+
+### Disabling LLM Analysis
+
+For pure tool-based analysis without LLM:
+
+```yaml
+# config.yaml
+analysis:
+  enable_llm: false
+```
+
+Or via CLI:
+
+```bash
+python -m src.soc_agent file sample.exe --no-llm
+```
+
+### Performance Tuning
+
+```yaml
+# config.yaml - Performance optimizations
+llm:
+  provider: "ollama"
+  ollama_model: "llama3.1:8b"
+  temperature: 0.1        # Lower = faster, more deterministic
+  timeout: 60             # Reduce for faster failures
+  
+analysis:
+  enable_llm: true
+  llm_retry_count: 2      # Retries on failure
+  llm_cache_results: true # Cache identical queries
+```
+
+### Troubleshooting
+
+| Issue | Solution |
+|-------|----------|
+| "Connection refused" | Start Ollama: `ollama serve` |
+| "Model not found" | Pull model: `ollama pull llama3.1:8b` |
+| Slow responses | Use smaller model: `llama3.2:3b` |
+| Out of memory | Use quantized: `llama3.1:8b-q4_0` |
+| JSON parse errors | Check model supports JSON format |
 
 ---
 
@@ -925,6 +1149,295 @@ result = await analyzer.analyze("email.eml")
     'verdict': 'SUSPICIOUS'
 }
 ```
+
+---
+
+## Roadmap
+
+### v1.0.0 (Current)
+✅ Multi-source threat intelligence (20+ sources)  
+✅ Professional malware analysis (PE/ELF/Office/PDF)  
+✅ Email forensics & phishing detection  
+✅ Local LLM integration (Ollama)  
+✅ Automated detection rule generation  
+✅ Interactive HTML reports  
+✅ MCP Server for Claude Desktop  
+
+### v1.1.0 (Planned)
+🔲 MISP integration for threat sharing  
+🔲 Elasticsearch/OpenSearch output  
+🔲 Custom YARA rule management  
+🔲 Batch processing improvements  
+🔲 Report templating system  
+
+### v2.0.0 (Future)
+
+#### 🧠 Security-Focused LLM Integration
+
+Fine-tuned cybersecurity LLMs for enhanced analysis:
+
+```yaml
+# Planned config
+llm:
+  provider: "security-llm"
+  models:
+    - SecBERT          # Security-specific embeddings
+    - MalBERTa         # Malware classification
+    - PhishLLM         # Phishing detection
+    - ThreatGPT        # Threat intelligence analysis
+  
+  custom_models:
+    - path: "./models/soc-analyst-7b"  # Custom fine-tuned
+      specialty: "incident-response"
+```
+
+**Planned Capabilities:**
+- Malware family classification with high accuracy
+- Automated threat report generation
+- Attack pattern recognition
+- IOC correlation and enrichment
+- Natural language threat hunting queries
+
+---
+
+#### 🌐 Local Web Application (SOC Dashboard)
+
+Browser-based interface for team collaboration:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Blue Team Assistant - SOC Dashboard                    v2.0│
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐           │
+│  │ Active      │ │ Threats     │ │ Pending     │           │
+│  │ Cases: 12   │ │ Today: 847  │ │ Review: 5   │           │
+│  └─────────────┘ └─────────────┘ └─────────────┘           │
+│                                                             │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │ Recent Investigations                                │   │
+│  ├─────────────────────────────────────────────────────┤   │
+│  │ 🔴 malware.exe    │ MALICIOUS │ 92/100 │ 10:32 AM  │   │
+│  │ 🟡 phishing.eml   │ SUSPICIOUS│ 67/100 │ 10:15 AM  │   │
+│  │ 🟢 update.msi     │ CLEAN     │ 12/100 │ 09:45 AM  │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│  [Upload File] [Investigate IOC] [Email Analysis] [Reports]│
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Planned Features:**
+- Real-time analysis dashboard
+- Team collaboration & case management
+- Investigation history & search
+- Customizable widgets
+- Dark/Light theme
+- Role-based access control
+- REST API for integrations
+
+---
+
+#### 🐝 TheHive & Cortex Integration
+
+Seamless SOAR platform integration:
+
+```yaml
+# Planned config
+integrations:
+  thehive:
+    enabled: true
+    url: "https://thehive.local:9000"
+    api_key: "your-hive-api-key"
+    organization: "SOC-Team"
+    
+    auto_create_case: true      # Create case on MALICIOUS verdict
+    auto_add_observables: true  # Add IOCs as observables
+    case_template: "malware-analysis"
+    
+  cortex:
+    enabled: true
+    url: "https://cortex.local:9001"
+    api_key: "your-cortex-api-key"
+    
+    analyzers:
+      - VirusTotal_GetReport
+      - AbuseIPDB_1_0
+      - Shodan_DNSResolve
+      - MISP_2_1
+    
+    responders:
+      - Mailer_1_0
+      - Wazuh_1_0
+```
+
+**Planned Workflow:**
+```
+Blue Team Assistant Analysis
+         │
+         ▼
+   ┌─────────────┐
+   │ MALICIOUS   │──────────────────┐
+   │ Detected    │                  │
+   └─────────────┘                  ▼
+         │                 ┌─────────────────┐
+         │                 │   TheHive       │
+         │                 │   Auto-Create   │
+         │                 │   Case #1234    │
+         │                 └────────┬────────┘
+         │                          │
+         ▼                          ▼
+   ┌─────────────┐         ┌─────────────────┐
+   │ Cortex      │◄────────│   Observables   │
+   │ Enrichment  │         │   - Hash        │
+   └─────────────┘         │   - IPs         │
+         │                 │   - Domains     │
+         ▼                 └─────────────────┘
+   ┌─────────────┐
+   │ Auto        │
+   │ Responders  │
+   └─────────────┘
+```
+
+---
+
+#### 🔬 Ghidra Automation Integration
+
+Automated reverse engineering for deep malware analysis:
+
+```yaml
+# Planned config
+reverse_engineering:
+  ghidra:
+    enabled: true
+    install_path: "/opt/ghidra"
+    headless: true
+    
+    auto_analysis:
+      - decompile_functions     # Auto-decompile suspicious functions
+      - extract_strings         # Enhanced string extraction
+      - identify_crypto         # Crypto algorithm detection
+      - find_c2_patterns        # C2 communication patterns
+      - detect_packers          # Packer/crypter identification
+    
+    scripts:
+      - FindCryptoPrimitives.java
+      - ExtractIOCs.java
+      - IdentifyMalwareFamily.java
+      - GenerateYaraSignature.java
+```
+
+**Planned Capabilities:**
+
+| Feature | Description |
+|---------|-------------|
+| **Auto-Decompilation** | Automatic function decompilation |
+| **Crypto Detection** | Identify encryption algorithms |
+| **C2 Extraction** | Find command & control patterns |
+| **String Decryption** | Decrypt obfuscated strings |
+| **API Mapping** | Map suspicious API calls to MITRE |
+| **YARA Generation** | Generate signatures from binary patterns |
+| **Call Graph Analysis** | Visualize function relationships |
+
+**Example Output:**
+```json
+{
+  "ghidra_analysis": {
+    "decompiled_functions": 247,
+    "suspicious_functions": [
+      {
+        "name": "FUN_00401a20",
+        "behavior": "Process Injection",
+        "apis": ["VirtualAllocEx", "WriteProcessMemory", "CreateRemoteThread"],
+        "mitre": "T1055.001"
+      }
+    ],
+    "crypto_detected": [
+      {"algorithm": "AES-256-CBC", "key_location": "0x00405000"},
+      {"algorithm": "RC4", "key_derivation": "hardcoded"}
+    ],
+    "c2_patterns": [
+      {"type": "HTTP", "url_pattern": "/gate.php?id=*"},
+      {"type": "DNS", "domain_generation": "DGA detected"}
+    ],
+    "generated_yara": "rule MAL_Sample_Ghidra {...}"
+  }
+}
+```
+
+---
+
+#### 🖥️ Interactive SOC Agent
+
+Terminal-based interactive investigation interface:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Blue Team Assistant - Interactive Mode              v2.0   │
+│  Type 'help' for commands, 'exit' to quit                   │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  soc> analyze malware.exe                                   │
+│  [████████████████████████████████████████] 100%            │
+│                                                             │
+│  ╔═══════════════════════════════════════════════════════╗  │
+│  ║  VERDICT: MALICIOUS (87/100)                          ║  │
+│  ║  Family: Emotet                                       ║  │
+│  ║  MITRE: T1055, T1027, T1071                          ║  │
+│  ╚═══════════════════════════════════════════════════════╝  │
+│                                                             │
+│  soc> investigate 185.220.101.1                            │
+│  [Querying 20 sources...]                                   │
+│  ✓ VirusTotal: 15/87 detections                            │
+│  ✓ AbuseIPDB: 100% confidence malicious                    │
+│  ✓ Shodan: Tor exit node detected                          │
+│                                                             │
+│  soc> export case --format thehive                         │
+│  ✓ Case #4521 created in TheHive                           │
+│                                                             │
+│  soc> hunt "powershell -enc" --last 24h                    │
+│  Found 3 matches in SIEM...                                 │
+│                                                             │
+│  soc> help                                                  │
+│  Commands:                                                  │
+│    analyze <file>      - Analyze file                       │
+│    investigate <ioc>   - Investigate IOC                    │
+│    email <file>        - Analyze email                      │
+│    hunt <query>        - Threat hunt in SIEM                │
+│    export <format>     - Export to TheHive/MISP             │
+│    report <type>       - Generate report                    │
+│    history             - Show analysis history              │
+│    config              - Show/edit configuration            │
+│    exit                - Exit interactive mode              │
+│                                                             │
+│  soc> _                                                     │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Planned Features:**
+- Tab completion for commands and file paths
+- Command history with arrow keys
+- Real-time progress indicators
+- Color-coded output (severity-based)
+- Session persistence
+- Pipeline support (`analyze file.exe | export thehive`)
+- Scripting support for automation
+- Multi-window TUI with tmux-like splits
+
+---
+
+### Contributing to Roadmap
+
+Have ideas for v2.0? We welcome contributions!
+
+1. **Feature Requests**: Open an issue with `[Feature Request]` tag
+2. **Discussions**: Join discussions in GitHub Discussions
+3. **Pull Requests**: PRs for roadmap items are welcome
+
+Priority is given to features that:
+- Enhance SOC analyst workflow
+- Improve detection accuracy
+- Maintain local-first privacy
+- Support aviation/critical infrastructure
 
 ---
 

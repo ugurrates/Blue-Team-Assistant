@@ -1,0 +1,330 @@
+/**
+ * MCP-FOR-SOC Theme System
+ * v5.1 Advanced HTML Reports
+ * Dark/Light Mode with smooth transitions
+ */
+
+:root {
+    /* Light Mode Colors */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-tertiary: #e9ecef;
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --shadow: rgba(0, 0, 0, 0.1);
+    
+    /* Status Colors (same in both modes) */
+    --color-success: #28a745;
+    --color-warning: #ffc107;
+    --color-danger: #dc3545;
+    --color-info: #17a2b8;
+    --color-primary: #4facfe;
+    
+    /* Chart Colors */
+    --chart-bg: #ffffff;
+    --chart-grid: #e9ecef;
+}
+
+[data-theme="dark"] {
+    /* Dark Mode Colors */
+    --bg-primary: #1a1d23;
+    --bg-secondary: #242831;
+    --bg-tertiary: #2d323e;
+    --text-primary: #e9ecef;
+    --text-secondary: #adb5bd;
+    --border-color: #495057;
+    --shadow: rgba(0, 0, 0, 0.3);
+    
+    /* Chart Colors */
+    --chart-bg: #242831;
+    --chart-grid: #495057;
+}
+
+/* Global Styles */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Cards */
+.card {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    box-shadow: 0 2px 4px var(--shadow);
+}
+
+.card-header {
+    background-color: var(--bg-tertiary);
+    border-bottom-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.card-body {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Tables */
+.table {
+    color: var(--text-primary);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--bg-tertiary);
+}
+
+.table-bordered {
+    border-color: var(--border-color);
+}
+
+.table-bordered td,
+.table-bordered th {
+    border-color: var(--border-color);
+}
+
+/* Badges (keep vibrant in both modes) */
+.badge {
+    color: white;
+}
+
+.badge-success {
+    background-color: var(--color-success);
+}
+
+.badge-warning {
+    background-color: var(--color-warning);
+    color: #212529;
+}
+
+.badge-danger {
+    background-color: var(--color-danger);
+}
+
+.badge-info {
+    background-color: var(--color-info);
+}
+
+.badge-primary {
+    background-color: var(--color-primary);
+}
+
+/* Alerts */
+.alert {
+    border-color: var(--border-color);
+}
+
+.alert-success {
+    background-color: var(--color-success);
+    color: white;
+    border-color: var(--color-success);
+}
+
+.alert-warning {
+    background-color: var(--color-warning);
+    color: #212529;
+    border-color: var(--color-warning);
+}
+
+.alert-danger {
+    background-color: var(--color-danger);
+    color: white;
+    border-color: var(--color-danger);
+}
+
+.alert-info {
+    background-color: var(--color-info);
+    color: white;
+    border-color: var(--color-info);
+}
+
+/* Code Blocks */
+pre, code {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+/* Links */
+a {
+    color: var(--color-primary);
+}
+
+a:hover {
+    color: #3a8fe0;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+    background-color: #3a8fe0;
+    border-color: #3a8fe0;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background-color: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    box-shadow: 0 2px 8px var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* Chart containers */
+.chart-container {
+    position: relative;
+    height: 400px;
+    margin: 20px 0;
+    padding: 20px;
+    background-color: var(--chart-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+/* Report Header */
+.report-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, #00f2fe 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 2rem;
+}
+
+/* Status Indicators */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-indicator.success {
+    background-color: var(--color-success);
+}
+
+.status-indicator.warning {
+    background-color: var(--color-warning);
+}
+
+.status-indicator.danger {
+    background-color: var(--color-danger);
+}
+
+/* Timeline (Email Hops) */
+.timeline {
+    position: relative;
+    padding: 20px 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 40px;
+    margin-bottom: 20px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: -20px;
+    width: 2px;
+    background-color: var(--border-color);
+}
+
+.timeline-item:last-child::before {
+    display: none;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    border: 2px solid var(--bg-primary);
+}
+
+.timeline-content {
+    background-color: var(--bg-tertiary);
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid var(--color-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Print styles */
+@media print {
+    .theme-toggle,
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        background-color: white;
+        color: black;
+    }
+    
+    .card {
+        break-inside: avoid;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .theme-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+}
