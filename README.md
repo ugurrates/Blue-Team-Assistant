@@ -1484,7 +1484,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Ugur Ates**
 - GitHub: [@ugur-ates](https://github.com/ugur-ates)
 - Medium: [@ugur.can.ates](https://medium.com/@ugur.can.ates)
-- LinkedIn: [Ugur Ates](https://linkedin.com/in/ugur-ates)
+- LinkedIn: [Ugur Ates]([https://linkedin.com/in/ugur-ates](https://www.linkedin.com/in/ugurcanates/))
 
 ---
 
